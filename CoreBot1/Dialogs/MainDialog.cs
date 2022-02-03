@@ -84,13 +84,14 @@ namespace CoreBot1.Dialogs
 
                     _jobDetails = new JobDetails() { Job = profession };
 
-                    if (luisResult.Entities.LocationAny == null)
-                    {
-                        return await stepContext.BeginDialogAsync("GetMissingInfo", _jobDetails, cancellationToken);
-                    }
+
                     if (luisResult.Entities.geographyV2 == null)
                     {
-                        return await stepContext.ReplaceDialogAsync(InitialDialogId, "Sorry, I don't know that location. Please specify the job again.", cancellationToken);
+                        if (luisResult.Entities.LocationAny != null)
+                        {
+                            return await stepContext.ReplaceDialogAsync(InitialDialogId, "Sorry, I don't know that location. Please specify the job again.", cancellationToken);
+                        }
+                        return await stepContext.BeginDialogAsync("GetMissingInfo", _jobDetails, cancellationToken);
                     }
 
                     _jobDetails.Location = luisResult.Entities.geographyV2[0].Location;
